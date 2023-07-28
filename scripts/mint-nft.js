@@ -1,5 +1,5 @@
 require("dotenv").config();
-const API_URL = process.env.API_URL_Sepolia;
+const API_URL = process.env.API_URL_Goerli;
 
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -8,7 +8,7 @@ const web3 = createAlchemyWeb3(API_URL);
 
 const contract = require("../artifacts/contracts/Lock.sol/MyNft.json");
 
-const contractAddress = "0x39d62eFc467dF59fA6DBfD3E1E4bE853c32D8f8e";
+const contractAddress = "0xcde392a5e86be34b3ec06e5206a5bf328d4353f9";
 const ipfsUrls = [
   "https://gateway.pinata.cloud/ipfs/QmRnDDec39hYttvzrM1rtrWCs26E8odY2g3pRcpbk5rzWq",
   "https://gateway.pinata.cloud/ipfs/QmSMJmhd1CdqQDMVP9Hztd1vdmkAXaBfjZkkxf8iwyKh7D",
@@ -29,7 +29,7 @@ async function mintNFT(tokenURI) {
       from: PUBLIC_KEY,
       to: contractAddress,
       nonce: nonce,
-      gas: 50000000,
+      gas: 500000,
       data: MyNft.methods.mintNFT(PUBLIC_KEY, tokenURI).encodeABI(), 
       
     };

@@ -1,50 +1,43 @@
 const hre = require("hardhat");
-const PUBLIC_KEY = process.env.PUBLIC_KEY;
+const fxRootContractABI = require("../contractABI.json");
+const tokenContractJSON = require("../artifacts/contracts/Lock.sol/MyNft.json");
+
+const tokenAddress = "0xcde392a5e86be34b3ec06e5206a5bf328d4353f9"; // place your erc721 contract address here
+const tokenABI = tokenContractJSON.abi;
+const fxERC721RootAddress = "0xF9bc4a80464E48369303196645e876c8C7D972de";
+const walletAddress = "0x146d57503bA557d6A5c8630829Ab21aE65B44F1D"; // place your public address for your wallet here
+
+
 
 async function main() {
-  // Connect to the Mumbai Ethereum Testnet
-  if (hre.network.name !== "mumbai") {
-    throw new Error("Please run the script on the Mumbai network.");
-  }
 
-  console.log("Connected to network:", hre.network.name);
+    const tokenContract = await hre.ethers.getContractAt(tokenABI, tokenAddress);
+    const fxContract = await hre.ethers.getContractAt(fxRootContractABI, fxERC721RootAddress);
 
+    console.log("Contract address:", tokenAddress);
+
+    // Define the token IDs of the NFTs you want to transfer
+    const tokenIds = [1, 2, 3, 4, 5];
+
+    for (let i = 0; i < tokenIds.length; i++) {
+      const tokenId = tokenIds[i];
+      const approveTx = await tokenContract.approve(fxERC721RootAddress, tokenId);
+      await approveTx.wait();
+
+      console.log('Approval confirmed');
+
+      const depositTx = await fxContract.deposit(tokenAddress, walletAddress, tokenId, "0x6556");
+      await depositTx.wait();
+
+      console.log("Tokens deposited");
+    }
+    
   
-  const FxrootAddress = "0xF9bc4a80464E48369303196645e876c8C7D972de";
-  const MyNftAddress = "0x39d62eFc467dF59fA6DBfD3E1E4bE853c32D8f8e"; 
-
-  // Retrieve the deployed MyNFT contract instance
-  const MyNFT = await hre.ethers.getContractFactory("MyNft");
-  const myNft = await MyNFT.attach(MyNftAddress);
-  console.log("Contract address:", myNft.address);
-
-  const walletAddress = PUBLIC_KEY;
-
-  // Define the token IDs of the NFTs you want to transfer
-  const tokenIds = [1, 2, 3, 4, 5]; 
-
-  // Approve and deposit each NFT to the FxPortal Bridge for transfer
-  for (let i = 0; i < tokenIds.length; i++) {
-    const tokenId = tokenIds[i];
-    console.log(`Approving NFT with token ID ${tokenId} for transfer...`);
-    await myNft.approve(FxrootAddress, tokenId);
-
-    console.log(`Depositing NFT with token ID ${tokenId} to the FxPortal Bridge...`);
-    await myNft["safeTransferFrom(address,address,uint256)"](hre.ethers.constants.AddressZero, FxrootAddress, tokenId);
   }
-
-  console.log("Batch transfer of NFTs completed successfully!");
-
-  // Test balanceOf
-  const balance = await MyNFT.balanceOf(walletAddress);s
-  console.log("MyNFT wallet balance", walletAddress, "is:", balance.toString());
-
-}
-
-// Run the script with the Hardhat command line interface
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
+  
+  // We recommend this pattern to be able to use async/await everywhere
+  // and properly handle errors.
+  main().catch((error) => {
     console.error(error);
-    process.exit(1);
+    process.exitCode = 1;
   });
