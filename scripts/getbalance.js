@@ -1,9 +1,10 @@
 const hre = require("hardhat");
-const tokenContractJSON = require("../artifacts/contracts/MetaToken.sol/MetaToken.json");
+const tokenContractJSON = require("../artifacts/contracts/Lock.sol/MyNft.json");
+const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
-const tokenAddress = ""; // place your erc721 contract address on polygon network here
+const tokenAddress = "0xcde392a5e86be34b3ec06e5206a5bf328d4353f9"; // place your erc721 contract address on polygon network here
 const tokenABI = tokenContractJSON.abi;
-const walletAddress = "0x146d57503bA557d6A5c8630829Ab21aE65B44F1D"; // place your public address for your wallet here
+const walletAddress = PUBLIC_KEY; // place your public address for your wallet here
 
 async function main() {
 
